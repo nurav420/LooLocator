@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Loo Locator</title>
+  </head>
+  <body>
+    <!-- Format the text below! When you're done, you can click over to solution.html to see how I did it. 
+-->
+    <h1>Are you in an unknown city where you dont understand the signs?</h1>
+
+    <h2>This page will tell you how to get to the nearest toilet</h2>
+
+    <p></p>
+
+    <img
+      src=" https://kinder-api-media.s3.eu-west-1.amazonaws.com/images/b3049e683502e20384a03d43f5403d06_original"
+      alt="Sanitation Stats"
+    />
+
+    <p>
+      Our charity is dedicated to improving the lives of people in villages
+      throughout Asia by building clean, safe sanitation facilities. With your
+      support, we can help to provide communities with the resources they need
+      to maintain good health and well-being. Your donation will go towards
+      building toilets and other sanitation infrastructure, as well as providing
+      education and training to help communities maintain their facilities over
+      the long term. By investing in clean sanitation, we can help to create a
+      healthier, more sustainable future for the people of these villages. Join
+      us in our mission to make a difference in the lives of people in Asia, and
+      help us build a brighter future for all.
+    </p>
+
+    <div id="map"></div>
+    <button onclick="findToilet()">Find Toilet</button>
+    <p id="result"></p>
+    <script>
+      // Check if the browser supports the Geolocation API
+      if (!navigator.geolocation) {
+        console.log("Geolocation is not supported by your browser");
+        return;
+      }
+
+      function findToilet() {
+        // Get the user's current position
+        navigator.geolocation.getCurrentPosition(success, error);
+      }
+
+      function success(position) {
+        // Get the coordinates of the user's position
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+
+        // Use the Google Maps Places API to search for nearby toilet facilities
+        var apiKey = "YOUR_API_KEY";
+        var requestUrl =
+          "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
+          latitude +
+          "," +
+          longitude +
+          "&radius=500&type=toilet&key=" +
+          apiKey;
+
+        // Send an HTTP GET request to the Places API
+        var request = new XMLHttpRequest();
+        request.open("GET", requestUrl, true);
+        request.onload = function () {
+          // Parse the response
+          var response = JSON.parse(request.response);
+          console.log(response);
+
+          // Check if the request was successful
+          if (response.status == "OK") {
+            // Get the list of toilet facilities
+            var toiletFacilities = response.results;
+
+            // Find the closest toilet facility
+            var closestToilet = toiletFacilities[0];
+            var minDistance = getDistance(
+              latitude,
+              longitude,
+              closestToilet.geometry.location.lat,
+              closestToilet.geometry.location.lng
+            );
+            for (var i = 1; i < toiletFacilities.length; i++) {
+              var toilet = toiletFacilities[i];
+              var distance = getDistance(
+                latitude,
+                longitude,
+                toilet.geometry.location.lat,
+                toilet.geometry.location.lng
+              );
+              if (distance < minDistance) {
+                closestToilet = toilet;
+                minDistance = distance;
+              }
+            }
+
+            // Display the name and address of the closest toilet facility
+            console.log("The closest toilet is: " + closestToilet.name);
+            console.log("Address: " + closestToilet.vicinity);
+          } else {
+            console.log(
+              "An error occurred while searching for toilet facilities"
+            );
+          }
+        };
+        request.send();
+
+        // Create a Google Maps map centered on the user's position
+        var map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 8,
+          center: { lat: latitude, lng: longitude },
+        });
+
+        // Add a marker to the map at the user's position
+        var marker = new google.maps.Marker({
+          position: { lat: latitude, lng: longitude },
+          map: map,
+        });
+      }
+
+      function error() {
+        console.log("Unable to retrieve your location");
+      }
+    </script>
+
+    <a
+      href="https://hop.clickbank.net/?affiliate=hackmylife&vendor=exipure&tid=201222&pg=xpx"
+      ><img src="https://exipure.com/assets/images/aff/728x90x1.jpg" />
+    </a>
+    <a
+      href="https://hop.clickbank.net/?affiliate=hackmylife&vendor=exipure&tid=201222&pg=xpx"
+      ><img src="https://exipure.com/assets/images/aff/728x90x6.png" />
+    </a>
+  </body>
+</html>
